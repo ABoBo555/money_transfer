@@ -18,4 +18,4 @@ After all save it and deploy as Webapp.
   - editWebhookurl in code.gs file (which is discord webhookurl) for edit.
   - RECEIPT_FOLDER_ID in code.gs [create a folder in drive and copy its id here]
 
-Don't forget to copy the Gsheet's column row as it is and paste it in your sheet.
+Don't forget to copy the Gsheet's column header row(1st row) as it is and paste it in your sheet.
