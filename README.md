@@ -13,7 +13,7 @@ Set the parameters as according- onEdit,Head,From spreadsheet,On edit.
 After all save it and deploy as Webapp.
 
 - (Remainder if u wanna create new one , need to change)
-  - action para in <form> tag -> form.html to corresponding webappurl you deploy.
+  - action para in [form tag] in form.html file to corresponding webappurl you deploy.
   - formWebhookUrl in code.gs file (which is discord webhookurl) for record save.
   - editWebhookurl in code.gs file (which is discord webhookurl) for edit.
 
