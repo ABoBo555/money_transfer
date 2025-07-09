@@ -16,4 +16,5 @@ After all save it and deploy as Webapp.
   - action para in [form tag] in form.html file to corresponding webappurl you deploy.
   - formWebhookUrl in code.gs file (which is discord webhookurl) for record save.
   - editWebhookurl in code.gs file (which is discord webhookurl) for edit.
+  - RECEIPT_FOLDER_ID in code.gs [create a folder in drive and copy its id here]
 

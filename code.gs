@@ -1,7 +1,7 @@
 // Handle HTTP POST requests from custom HTML form
 function doPost(e) {
   // Constants
-  const RECEIPT_FOLDER_ID = "1gErUzgjd9fH54RIe3ILv9bKwAU28PZ2C";
+  const RECEIPT_FOLDER_ID = "13XWHd0cxQ0k6lQgrQ8vixOTtOHnmUWD_";
   
   try {
     // ULTRA DEBUG logging to see EVERYTHING we're receiving
@@ -220,31 +220,31 @@ function doPost(e) {
 }
 
 // Backup function for Google Forms compatibility (if you still want to use Google Forms)
-function onFormSubmit(e) {
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const lastRow = sheet.getLastRow();
-    const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
+// function onFormSubmit(e) {
+//   try {
+//     const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+//     const lastRow = sheet.getLastRow();
+//     const rowData = sheet.getRange(lastRow, 1, 1, sheet.getLastColumn()).getValues()[0];
 
-    // Transaction Status - auto define
-    const row = e.range.getRow();
-    const statusColumn = 19;
-    const statusCell = sheet.getRange(row, statusColumn);
-    statusCell.setValue("Not Finish");
+//     // Transaction Status - auto define
+//     const row = e.range.getRow();
+//     const statusColumn = 19;
+//     const statusCell = sheet.getRange(row, statusColumn);
+//     statusCell.setValue("Not Finish");
 
-    // Format phone number column as TEXT to preserve leading zeros
-    sheet.getRange(row, 9).setNumberFormat("@");  // Column I: Phone Number as TEXT
+//     // Format phone number column as TEXT to preserve leading zeros
+//     sheet.getRange(row, 9).setNumberFormat("@");  // Column I: Phone Number as TEXT
 
-    // Total MMK numeric format alignment
-    const calculatedColumnIndex = 15;
-    sheet.getRange(lastRow, calculatedColumnIndex).setNumberFormat("#,##0");
+//     // Total MMK numeric format alignment
+//     const calculatedColumnIndex = 15;
+//     sheet.getRange(lastRow, calculatedColumnIndex).setNumberFormat("#,##0");
 
-    // Process the submitted data for notifications
-    processFormSubmission(rowData, lastRow);
-  } catch (error) {
-    Logger.log("Error in onFormSubmit: " + error.toString());
-  }
-}
+//     // Process the submitted data for notifications
+//     processFormSubmission(rowData, lastRow);
+//   } catch (error) {
+//     Logger.log("Error in onFormSubmit: " + error.toString());
+//   }
+// }
 
 // Process form submission data and send notifications (extracted from original onFormSubmit)
 function processFormSubmission(rowData, rowNumber) {
@@ -323,7 +323,22 @@ function processFormSubmission(rowData, rowNumber) {
       codeRows.push(`${paddedKey}:\n🆔${value}`);
     }
     else if (key === "NRC_Number") {
-      codeRows.push(`${paddedKey}:\n${value}`);
+      codeRows.push(`${paddedKey}:\n💳${value}`);
+    }
+    else if (key === "BG") {
+      codeRows.push(`${paddedKey}: 🅱️  ${value}`);
+    }
+    else if (key === "MM_Bank") {
+      codeRows.push(`${paddedKey}: 🏛️  ${value}`);
+    }
+    else if (key === "Bank_Branch") {
+      codeRows.push(`${paddedKey}: 🔠  ${value}`);
+    }
+    else if (key === "Bank_Acc_No") {
+      codeRows.push(`${paddedKey}: 🔢  ${value}`);
+    }
+    else if (key === "Name") {
+      codeRows.push(`${paddedKey}: 🌝  ${value}`);
     }
     else {
       codeRows.push(`${paddedKey}: ${value}`);
@@ -346,22 +361,24 @@ function processFormSubmission(rowData, rowNumber) {
 
   const recipients = [
     "raj1555kapoor@gmail.com",
-    "robbobroy224@gmail.com"
+    "robbobroy224@gmail.com",
+    "kasi777kasi@gmail.com"
   ];
   const subject = ["New Transaction ", rowData[0]].join("-");
 
-  try {
-    sendFormattedEmail(fieldMap, recipients, subject);
-  } catch (error) {
-    Logger.log("Error sending email: " + error);
-    MailApp.sendEmail({
-      to: "raj1555kapoor@gmail.com",
-      subject: "❌ Email Sending Failed",
-      body: error.stack || error.message
-    });
-  }
+  // send through email
+  // try {
+  //   sendFormattedEmail(fieldMap, recipients, subject);
+  // } catch (error) {
+  //   Logger.log("Error sending email: " + error);
+  //   MailApp.sendEmail({
+  //     to: "kasi777kasi@gmail.com",
+  //     subject: "❌ Email Sending Failed",
+  //     body: error.stack || error.message
+  //   });
+  // }
 
-  const formWebhookUrl = "https://discord.com/api/webhooks/1389894173439819776/qy87caiJgRUOyT8_C_Y8Bzk3D_CSBoPT6VXbP8IAekeXQvs9bPSx0j1GaUo75pkvZrBX";
+  const formWebhookUrl = "https://discord.com/api/webhooks/1392097833447850015/9_uL_V_ktDtUDKSOhDtCevJESdFwp-tqEOBVqv1jud0wfEpiZmLV9uIMuzAAUN_C6Eqi";
   sendToDiscord(finalMessage, formWebhookUrl);
 }
 
@@ -443,6 +460,23 @@ function sendToDiscord(message, webhookUrl) {
 
 function onEdit(e) {
   try {
+
+    const sheet = e.source.getActiveSheet();
+    const range = e.range;
+    const editedColumn = range.getColumn();
+    const editedRow = range.getRow();
+
+    // Set V-col (22) = N-col (14) + U-col (21)
+    try {
+      const nValue = Number(sheet.getRange(editedRow, 14).getDisplayValue().toString().replace(/,/g, "")) || 0;
+      const uValue = Number(sheet.getRange(editedRow, 21).getDisplayValue().toString().replace(/,/g, "")) || 0;
+      const vValue = nValue + uValue;
+      sheet.getRange(editedRow, 22).setValue(vValue);
+      Logger.log(`🟢 Set V-col (22) = N-col (14) + U-col (21): ${nValue} + ${uValue} = ${vValue}`);
+    } catch (calcErr) {
+      Logger.log(`❌ Error setting V-col: ${calcErr}`);
+    }
+
     // Check if this is running as an installable trigger
     if (!e || !e.source) {
       Logger.log("⚠️ WARNING: onEdit appears to be running as a simple trigger!");
@@ -450,12 +484,9 @@ function onEdit(e) {
       return;
     }
     
-    const sheet = e.source.getActiveSheet();
-    const range = e.range;
+    
     if (range.getNumRows() > 1 || range.getNumColumns() > 1) return;
 
-    const editedColumn = range.getColumn();
-    const editedRow = range.getRow();
     const STATUS_COL = 19; // Column S (Transaction Status)
 
     Logger.log(`🟡 Edited cell: R${editedRow}C${editedColumn}`);
@@ -494,16 +525,6 @@ function onEdit(e) {
       sheet.getRange(editedRow, 17).setValue(mon);        // Column Q: Month (Jul)
       sheet.getRange(editedRow, 18).setValue(yyyy);       // Column R: Year (2025)
 
-      // Set V-col (22) = N-col (14) + U-col (21)
-      try {
-        const nValue = Number(sheet.getRange(editedRow, 14).getDisplayValue().toString().replace(/,/g, "")) || 0;
-        const uValue = Number(sheet.getRange(editedRow, 21).getDisplayValue().toString().replace(/,/g, "")) || 0;
-        const vValue = nValue + uValue;
-        sheet.getRange(editedRow, 22).setValue(vValue);
-        Logger.log(`🟢 Set V-col (22) = N-col (14) + U-col (21): ${nValue} + ${uValue} = ${vValue}`);
-      } catch (calcErr) {
-        Logger.log(`❌ Error setting V-col: ${calcErr}`);
-      }
 
       // Get all field values (updated column positions)
       const id = sheet.getRange(editedRow, 1).getDisplayValue();              // Column A
@@ -555,12 +576,12 @@ function onEdit(e) {
       const fieldMap = [
         ["ID_Number", `🆔${id}`],
         ["Propose_Date", dateTimeValue],
-        ["BG", business_group],
-        ["MM_Bank", myanmar_bank],
-        ["Bank_Branch", township_bank_branch],
-        ["Bank_Acc_No", bank_acc_number],
-        ["NRC_Number", `\n${nrc_number}`],
-        ["Name", name],
+        ["BG", `🅱️  ${business_group}`],
+        ["MM_Bank", `🏛️  ${myanmar_bank}`],
+        ["Bank_Branch", `🔠  ${township_bank_branch}`],
+        ["Bank_Acc_No", `🔢  ${bank_acc_number}`],
+        ["NRC_Number", `\n💳${nrc_number}`],
+        ["Name", `🌝  ${name}`],
         ["Ph_No", `📞  ${phone_number}`],
         ["RM_Collect_Amt", formatFinancialValue(rm_collected_amount)],
         ["RM_Service_Fee", formatFinancialValue(rm_service_fee)],
@@ -588,7 +609,7 @@ function onEdit(e) {
       const message = `@everyone\n✅ Transaction Updated!\n${codeBlock}`;
 
       Logger.log("📤 Sending message:\n" + message);
-      const editWebhookUrl = "https://discord.com/api/webhooks/1390308572750938143/5Qvc3QE_lghA9pt3fPfLj0CpQTxYeGkHJ4mUx2eMFEs9GhuNlss2uoRqfkTkrWcEsEYQ";
+      const editWebhookUrl = "https://discord.com/api/webhooks/1392098339289301002/QIXN7O0cteVMJglnc_JImKRLDsWV77o4FkQ3oMPv8s6UHN1WkpdeDy3deyZ5rrExgcOO";
       sendToDiscord(message, editWebhookUrl);
     } else {
       Logger.log(`❌ Value "${newValue}" did not match target list (Finished/Cancel)`);
@@ -606,123 +627,7 @@ function doGet(e) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
-// Function to get the correct deployment URL - run this after deploying
-function getCurrentDeploymentURL() {
-  Logger.log("=== CURRENT DEPLOYMENT URL ===");
-  Logger.log("After deploying your web app, the URL should look like:");
-  Logger.log("https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec");
-  Logger.log("");
-  Logger.log("IMPORTANT DEPLOYMENT STEPS:");
-  Logger.log("1. Click 'Deploy' > 'New deployment'");
-  Logger.log("2. Choose type: Web app");
-  Logger.log("3. Execute as: Me (your-email@gmail.com)");
-  Logger.log("4. Who has access: Anyone");
-  Logger.log("5. Click 'Deploy'");
-  Logger.log("6. Copy the web app URL");
-  Logger.log("7. Replace 'REPLACE_WITH_NEW_DEPLOYMENT_URL' in your HTML files");
-  Logger.log("");
-  Logger.log("TESTING:");
-  Logger.log("1. Test the URL directly in browser - should show your form");
-  Logger.log("2. If you get 404, the deployment failed or URL is wrong");
-  Logger.log("3. If you get CORS error, deployment permissions are wrong");
-  Logger.log("===============================");
-}
 
-// Alternative simpler doPost for initial testing
-function doPost_SIMPLE_TEST(e) {
-  try {
-    Logger.log("=== SIMPLE TEST doPost ===");
-    Logger.log("Request received successfully!");
-    
-    // Log basic info
-    if (e.parameter) {
-      Logger.log("Form data received:");
-      Object.keys(e.parameter).forEach(key => {
-        Logger.log(`  ${key}: ${e.parameter[key]}`);
-      });
-    }
-    
-    // Check for files
-    let fileCount = 0;
-    if (e.parameter.receiptImage && typeof e.parameter.receiptImage === 'object' && e.parameter.receiptImage.getSize) {
-      fileCount = 1;
-      Logger.log(`File received: ${e.parameter.receiptImage.getName()}, size: ${e.parameter.receiptImage.getSize()}`);
-    }
-    
-    const responseData = {
-      status: 'success',
-      message: 'Simple test successful!',
-      filesReceived: fileCount,
-      timestamp: new Date().toISOString()
-    };
-    
-    Logger.log("Response:", responseData);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify(responseData))
-      .setMimeType(ContentService.MimeType.JSON);
-      
-  } catch (error) {
-    Logger.log("Error in simple test:", error.toString());
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        status: 'error',
-        message: error.message
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-// Quick test to verify file upload workflow with a mock file
-function testFileUploadWorkflow() {
-  try {
-    Logger.log("=== TESTING FILE UPLOAD WORKFLOW ===");
-    
-    // Step 1: Test folder access
-    Logger.log("Step 1: Testing folder access...");
-    const folder = getSpecificFolder("1gErUzgjd9fH54RIe3ILv9bKwAU28PZ2C");
-    Logger.log(`✅ Folder accessed: ${folder.getName()}, ID: ${folder.getId()}`);
-    
-    // Step 2: Create a test file blob
-    Logger.log("Step 2: Creating test file blob...");
-    const testContent = "Test file content for upload workflow test - " + new Date().toString();
-    const testBlob = Utilities.newBlob(testContent, "text/plain", "workflow_test.txt");
-    Logger.log(`✅ Test blob created: ${testBlob.getName()}, size: ${testBlob.getSize()}`);
-    
-    // Step 3: Generate unique ID
-    Logger.log("Step 3: Generating unique ID...");
-    const timestamp = new Date();
-    const uniqueId = `TEST${timestamp.getFullYear()}${String(timestamp.getMonth() + 1).padStart(2, '0')}${String(timestamp.getDate()).padStart(2, '0')}-${String(timestamp.getHours()).padStart(2, '0')}${String(timestamp.getMinutes()).padStart(2, '0')}${String(timestamp.getSeconds()).padStart(2, '0')}-WORKFLOW`;
-    Logger.log(`✅ Unique ID: ${uniqueId}`);
-    
-    // Step 4: Create file with naming convention
-    Logger.log("Step 4: Creating file in Drive...");
-    const finalFileName = `${uniqueId}_Receipt_1.jpg`;
-    const file = folder.createFile(blob.setName(finalFileName));
-    Logger.log(`✅ File created: ${file.getName()}, ID: ${file.getId()}`);
-    
-    // Step 5: Set sharing
-    Logger.log("Step 5: Setting file sharing...");
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    Logger.log(`✅ File sharing set`);
-    
-    // Step 6: Get URL
-    Logger.log("Step 6: Getting file URL...");
-    const fileUrl = file.getUrl();
-    Logger.log(`✅ File URL: ${fileUrl}`);
-    
-    Logger.log("=== WORKFLOW TEST COMPLETED SUCCESSFULLY ===");
-    Logger.log(`File should be visible in Drive folder: ${finalFileName}`);
-    
-    return `SUCCESS: File ${finalFileName} created and accessible at ${fileUrl}`;
-    
-  } catch (error) {
-    Logger.log("❌ WORKFLOW TEST FAILED");
-    Logger.log(`Error: ${error.toString()}`);
-    Logger.log(`Stack: ${error.stack}`);
-    return `FAILED: ${error.message}`;
-  }
-}
 
 // Helper function to get specific folder by ID in Google Drive
 function getSpecificFolder(folderId) {
@@ -776,126 +681,12 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-// Test function to verify deployment is working
-function testDeployment() {
-  Logger.log("=== DEPLOYMENT TEST ===");
-  Logger.log("If you can see this log, the deployment is accessible");
-  Logger.log("Current time: " + new Date().toString());
-  
-  // Test basic functionality
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    Logger.log("✅ Can access spreadsheet");
-    
-    const folder = getSpecificFolder("1gErUzgjd9fH54RIe3ILv9bKwAU28PZ2C");
-    Logger.log("✅ Can access Drive folder: " + folder.getName());
-    
-    return "Deployment test successful";
-  } catch (error) {
-    Logger.log("❌ Error in deployment test: " + error.toString());
-    return "Deployment test failed: " + error.message;
-  }
-}
 
-// Alternative GET handler to test if deployment responds
-function doGet_Test(e) {
-  Logger.log("=== GET TEST called ===");
-  Logger.log("Parameters: " + JSON.stringify(e.parameter || {}));
-  
-  return HtmlService.createHtmlOutput(`
-    <h1>✅ Apps Script Deployment is Working!</h1>
-    <p>Time: ${new Date().toString()}</p>
-    <p>If you see this page, the deployment URL is correct and accessible.</p>
-    <hr>
-    <h2>Test File Upload</h2>
-    <form method="POST" enctype="multipart/form-data">
-      <input type="text" name="testField" value="Test Value" required><br><br>
-      <input type="file" name="receiptImage" accept="image/*"><br><br>
-      <input type="submit" value="Test POST">
-    </form>
-  `).setTitle('Deployment Test');
-}
-
-// Test function to verify logging is working
-function testLogging() {
-  console.log("=== TEST LOGGING FUNCTION ===");
-  console.log("Current time: " + new Date().toString());
-  console.log("This should appear in Cloud Logging");
-  
-  Logger.log("=== LEGACY LOGGER TEST ===");
-  Logger.log("This should appear in Legacy Logs");
-  
-  return "Logging test completed";
-}
-
-// Test function for base64 image processing - run this manually in Apps Script editor
-function testBase64Manually() {
-  console.log("=== STARTING BASE64 MANUAL TEST ===");
-  Logger.log("=== STARTING BASE64 MANUAL TEST ===");
-  
-  try {
-    // Create a simple test image as base64 (1x1 red pixel PNG)
-    const testBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
-    const testImageName = "test_receipt.png";
-    const testImageType = "image/png";
-    
-    console.log("🧪 Test data prepared:");
-    console.log(`🧪 Image name: ${testImageName}`);
-    console.log(`🧪 Image type: ${testImageType}`);
-    console.log(`🧪 Base64 length: ${testBase64.length} characters`);
-    
-    Logger.log("🧪 Calling processBase64Image function...");
-    
-    // Call the base64 processing function
-    const result = processBase64Image(testBase64, testImageName, testImageType);
-    
-    console.log("🧪 ✅ BASE64 TEST COMPLETED SUCCESSFULLY!");
-    console.log(`🧪 Result URL: ${result}`);
-    
-    Logger.log("🧪 ✅ BASE64 TEST COMPLETED SUCCESSFULLY!");
-    Logger.log(`🧪 Result URL: ${result}`);
-    
-    // Additional verification - try to access the file
-    if (result) {
-      const fileId = result.match(/\/d\/([a-zA-Z0-9-_]+)/);
-      if (fileId && fileId[1]) {
-        try {
-          const verifyFile = DriveApp.getFileById(fileId[1]);
-          console.log(`🧪 ✅ File verification successful: ${verifyFile.getName()}, Size: ${verifyFile.getSize()}`);
-          Logger.log(`🧪 ✅ File verification successful: ${verifyFile.getName()}, Size: ${verifyFile.getSize()}`);
-        } catch (verifyError) {
-          console.log(`🧪 ⚠️ File verification failed: ${verifyError.toString()}`);
-          Logger.log(`🧪 ⚠️ File verification failed: ${verifyError.toString()}`);
-        }
-      }
-    }
-    
-    return {
-      success: true,
-      url: result,
-      message: "Base64 test completed successfully"
-    };
-    
-  } catch (error) {
-    console.log("🧪 ❌ BASE64 TEST FAILED!");
-    console.log(`🧪 Error: ${error.toString()}`);
-    console.log(`🧪 Stack: ${error.stack || 'No stack trace'}`);
-    
-    Logger.log("🧪 ❌ BASE64 TEST FAILED!");
-    Logger.log(`🧪 Error: ${error.toString()}`);
-    
-    return {
-      success: false,
-      error: error.toString(),
-      message: "Base64 test failed"
-    };
-  }
-}
 
 // Process base64 image data exactly like the sample code
 function processBase64Upload(data, mimetype, filename) {
   // Constants
-  const RECEIPT_FOLDER_ID = "1gErUzgjd9fH54RIe3ILv9bKwAU28PZ2C";
+  const RECEIPT_FOLDER_ID = "13XWHd0cxQ0k6lQgrQ8vixOTtOHnmUWD_";
   
   try {
     console.log(`📎 Processing base64 upload: Name=${filename}, Type=${mimetype}`);
@@ -947,69 +738,6 @@ function processBase64Upload(data, mimetype, filename) {
   }
 }
 
-/**
- * Test function to verify the new MMK columns (U and V) are being read correctly
- * Run this to test that the onEdit function can access the new columns
- */
-function testNewMMKColumns() {
-  try {
-    Logger.log("🧪 Testing new MMK columns access...");
-    
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const lastRow = sheet.getLastRow();
-    
-    if (lastRow < 2) {
-      Logger.log("❌ No data rows found in sheet");
-      return "❌ No data rows found. Please add some test data first.";
-    }
-    
-    // Test reading from the last row (most recent transaction)
-    const testRow = lastRow;
-    
-    Logger.log(`📊 Testing with row ${testRow}:`);
-    
-    // Read the new columns
-    const mmk_trans_fee = sheet.getRange(testRow, 21).getDisplayValue();  // Column U
-    const mmk_total = sheet.getRange(testRow, 22).getDisplayValue();      // Column V
-    const status = sheet.getRange(testRow, 19).getDisplayValue();         // Column S (Status)
-    const id = sheet.getRange(testRow, 1).getDisplayValue();              // Column A (ID)
-    
-    Logger.log(`🆔 Transaction ID: ${id}`);
-    Logger.log(`📊 Current Status: ${status}`);
-    Logger.log(`💰 MMK Trans Fee (Column U): "${mmk_trans_fee}"`);
-    Logger.log(`💰 MMK Total (Column V): "${mmk_total}"`);
-    
-    // Test the formatting function
-    const formatFinancialValue = (value) => {
-      if (!value || value === "") return "No Value";
-      const formattedValue = Number(value.toString().replace(/,/g, "")).toLocaleString("en-US");
-      const boldValue = formattedValue.replace(/[0-9]/g, (digit) => {
-        const boldDigits = ['𝟎', '𝟏', '𝟐', '𝟑', '𝟒', '𝟓', '𝟔', '𝟕', '𝟖', '𝟗'];
-        return boldDigits[parseInt(digit)];
-      });
-      return `💵  ${boldValue}`;
-    };
-    
-    Logger.log(`🎨 Formatted MMK Trans Fee: ${formatFinancialValue(mmk_trans_fee)}`);
-    Logger.log(`🎨 Formatted MMK Total: ${formatFinancialValue(mmk_total)}`);
-    
-    const result = `✅ Test completed successfully!
-📊 Row ${testRow} data:
-- Transaction ID: ${id}
-- Status: ${status}
-- MMK Trans Fee (U): ${mmk_trans_fee}
-- MMK Total (V): ${mmk_total}
 
-💡 To test the full workflow:
-1. Change the Status (column S) to "Finished" or "Cancel"
-2. Check if Discord message includes the new MMK fields`;
 
-    Logger.log("✅ " + result);
-    return result;
-    
-  } catch (error) {
-    Logger.log("❌ Error testing new columns: " + error.toString());
-    return "❌ Error: " + error.toString();
-  }
-}
 
