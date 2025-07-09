@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Transfer (Malay ⇄ Myanmar)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f6f3fb;
+      margin: 0;
+      padding: 0;
+    }
+    .form-header {
+      background: #673ab7;
+      color: #fff;
+      padding: 32px 0 16px 0;
+      text-align: center;
+      border-radius: 12px 12px 0 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 32px auto;
+      background: transparent;
+      border-radius: 12px;
+      padding: 0;
+    }
+    .form-section {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(103,58,183,0.08);
+      margin-bottom: 28px;
+      padding: 32px 28px 24px 28px;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-label {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #222;
+      margin-bottom: 8px;
+      margin-top: 0;
+      letter-spacing: 0.1px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      font-size: 1.1rem;
+      padding: 16px 14px;
+      border: 1.5px solid #dadce0;
+      border-radius: 8px;
+      background: #fafafa;
+      margin-bottom: 0;
+      margin-top: 0;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #673ab7;
+      background: #fff;
+    }
+    .form-required {
+      color: #d32f2f;
+      margin-left: 2px;
+      font-size: 1.1em;
+    }
+    .form-section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #673ab7;
+      margin-bottom: 18px;
+      margin-top: 0;
+    }
+    .conditional-group {
+      background: #f3fef6;
+      border: 2px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 24px 18px 18px 18px;
+      margin-bottom: 18px;
+      margin-top: 10px;
+      box-shadow: 0 1px 4px rgba(34,197,94,0.07);
+    }
+    .hidden {
+      display: none !important;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 550px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* File Preview Styles */
+    .file-preview-container {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .file-preview-item {
+      position: relative;
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 280px;
+      font-size: 0.9rem;
+    }
+    .file-preview-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #333;
+    }
+    .file-remove-btn {
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .file-remove-btn:hover {
+      background: #cc0000;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .form-header {
+        font-size: 1.8rem;
+        padding: 24px 16px 12px 16px;
+      }
+      .form-container { 
+        max-width: 95vw; 
+        margin: 16px auto;
+      }
+      .form-section { 
+        padding: 20px 16px 16px 16px; 
+        margin-bottom: 16px;
+      }
+      .form-input, .form-select, .form-textarea {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px 12px;
+      }
+      .modal-content { 
+        padding: 1.2rem;
+        width: 95%;
+        max-width: none;
+      }
+      .form-section-title {
+        font-size: 1.1rem;
+      }
+      .conditional-group {
+        padding: 16px 12px 12px 12px;
+      }
+      
+      /* Button responsive styles */
+      div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      #reviewButton, #clearButton {
+        min-width: auto !important;
+        width: 100% !important;
+        padding: 16px 24px !important;
+        font-size: 1.1rem !important;
+      }
+      
+      /* Modal buttons responsive */
+      div[style*="margin-top: 32px"] {
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      #submitButton, #editButton {
+        width: 100% !important;
+        padding: 14px 24px !important;
+      }
+      
+      /* File preview responsive */
+      .file-preview-container {
+        gap: 8px;
+      }
+      .file-preview-item {
+        max-width: 100%;
+        font-size: 0.85rem;
+      }
+      
+      /* Review modal content responsive */
+      #reviewDetails > div {
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: wrap;
+      }
+      #reviewDetails > div > span:first-child {
+        min-width: 120px !important;
+        flex-shrink: 0;
+      }
+      #reviewDetails > div > span:last-child {
+        flex: 1;
+        word-break: break-word;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-header {
+        font-size: 1.5rem;
+        padding: 20px 12px 10px 12px;
+      }
+      .form-container { 
+        max-width: 98vw; 
+        margin: 12px auto;
+      }
+      .form-section { 
+        padding: 16px 12px 12px 12px; 
+        margin-bottom: 12px;
+      }
+      .form-input, .form-select, .form-textarea {
+        padding: 12px 10px;
+      }
+      .modal-content { 
+        padding: 1rem;
+      }
+      
+      /* Smaller mobile - even more compact review layout */
+      #reviewDetails > div > span:first-child {
+        min-width: 100px !important;
+        font-size: 0.9rem;
+      }
+      #reviewDetails > div > span:last-child {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-header">
+    Money Transfer (Malay <span style="font-size:1.2em;">&#8646;</span> Myanmar)
+  </div>
+  <div class="form-container">
+    <form id="myForm" enctype="multipart/form-data" method="post" action="https://script.google.com/macros/s/AKfycbyHnhyZ1WpgfskXlK1IdRp4P11GS_Q04tZMlfenZzdMYX3S56o0mSX1x_G1b-P8T5agsg/exec">
+    
+      <!-- Section: Business Group -->
+      <div class="form-section">
+        <label class="form-label" for="BG">
+          Business Group <span class="form-required">*</span>
+        </label>
+        <select id="BG" name="BG" class="form-select" required>
+          <option value="">Choose</option>
+          <option value="BG 1">BG 1</option>
+          <option value="BG 2">BG 2</option>
+          <option value="BG 3">BG 3</option>
+          <option value="BG 4">BG 4</option>
+          <option value="BG 5">BG 5</option>
+        </select>
+      </div>
+      <!-- Section: Propose Date -->
+      <div class="form-section">
+        <label class="form-label" for="Propose_Date">
+          Propose Date <span class="form-required">*</span>
+        </label>
+        <input type="date" id="Propose_Date" name="Propose_Date" class="form-input" required>
+      </div>
+      <!-- 3. Myanmar Bank (Dropdown, required) -->
+      <div class="form-section">
+        <label for="MM_Bank" class="form-label">Myanmar Bank <span class="form-required">*</span></label>
+        <select id="MM_Bank" name="MM_Bank" class="form-select" required>
+          <option value="">-- Select Bank --</option>
+          <option value="KBZ Bank">KBZ Bank</option>
+          <option value="Kpay">Kpay</option>
+          <option value="CB Bank">CB Bank</option>
+          <option value="AGD Bank">AGD Bank</option>
+          <option value="AYA Bank">AYA Bank</option>
+          <option value="GT Bank">GT Bank</option>
+          <option value="MAB Bank">MAB Bank</option>
+          <option value="UAB Bank">UAB Bank</option>
+          <option value="YOMA Bank">YOMA Bank</option>
+          <option value="WaveAcc">WaveAcc</option>
+          <option value="WaveShop">WaveShop</option>
+          <option value="Phone Bill">Phone Bill</option>
+          <option value="Cash Delivery">Cash Delivery</option>
+        </select>
+      </div>
+
+      <!-- Conditional Fields Group 1: Visible for "Rest of values" -->
+      <div id="conditionalGroup1" class="conditional-group border-green-300 bg-green-50 form-section hidden">
+        <h4 class="text-lg font-semibold text-green-800 mb-3 form-section-title">Bank/Cash Details (Part 1)</h4>
+        <!-- 4. Township (Bank Branch) -->
+        <div>
+          <label for="Bank_Branch" class="form-label">Township (Bank Branch)</label>
+          <input type="text" id="Bank_Branch" name="Bank_Branch" class="form-input">
+        </div>
+        <!-- 5. Bank Account Number -->
+        <div>
+          <label for="Bank_Acc_No" class="form-label">Bank Account Number</label>
+          <input type="text" id="Bank_Acc_No" name="Bank_Acc_No" class="form-input">
+        </div>
+      </div>
+
+      <!-- Conditional Fields Group 2: Visible for "Rest of values", "WaveShop", "Cash Delivery" -->
+      <div id="conditionalGroup2" class="conditional-group border-green-300 bg-green-50 form-section hidden">
+        <h4 class="text-lg font-semibold text-green-800 mb-3 form-section-title">Bank/Cash Details (Part 2)</h4>
+        <!-- 6. NRC Number -->
+        <div>
+          <label for="NRC_Number" class="form-label">NRC Number</label>
+          <input type="text" id="NRC_Number" name="NRC_Number" class="form-input">
+        </div>
+      </div>
+
+      <!-- Conditional Fields Group 3: Visible for "Rest of values", "Kpay", "WaveAcc", "WaveShop", "Cash Delivery" -->
+      <div id="conditionalGroup3" class="conditional-group border-green-300 bg-green-50 form-section hidden">
+        <h4 class="text-lg font-semibold text-green-800 mb-3 form-section-title">Recipient Details (Name)</h4>
+        <!-- 7. Name -->
+        <div>
+          <label for="Name" class="form-label">Name</label>
+          <input type="text" id="Name" name="Name" class="form-input">
+        </div>
+      </div>
+
+      <!-- Conditional Fields Group 4: Visible for "Rest of values", "Kpay", "WaveAcc", "WaveShop", "Cash Delivery", "Phone Bill" -->
+      <div id="conditionalGroup4" class="conditional-group border-green-300 bg-green-50 form-section hidden">
+        <h4 class="text-lg font-semibold text-green-800 mb-3 form-section-title">Recipient Details (Phone)</h4>
+        <!-- 8. Phone Number -->
+        <div>
+          <label for="Ph_No" class="form-label">Phone Number</label>
+          <input
+            type="tel"
+            id="Ph_No"
+            name="Ph_No"
+            class="form-input"
+            pattern="^\+?\d*$"
+            inputmode="tel"
+            autocomplete="tel"
+            maxlength="13"
+            oninput="this.value = this.value.replace(/[^0-9+]/g, '').replace(/(?!^)\+/g, '')"
+          >
+        </div>
+      </div>
+
+      <!-- 9. RM collected amount (numeric, required) -->
+      <div class="form-section">
+        <label for="RM_Collect_Amt" class="form-label">RM Collected Amount <span class="form-required">*</span></label>
+        <input type="number" id="RM_Collect_Amt" name="RM_Collect_Amt" class="form-input" required min="1">
+      </div>
+
+      <!-- 10. RM Buying Rate (numeric, required) -->
+      <div class="form-section">
+        <label for="RM_Buy_Rate" class="form-label">RM Buying Rate <span class="form-required">*</span></label>
+        <input type="number" id="RM_Buy_Rate" name="RM_Buy_Rate" class="form-input" required min="1">
+      </div>
+
+      <!-- MMK Transfer Amount (auto-calculated, editable) -->
+      <div class="form-section">
+        <label for="MMK_Trans_Amt" class="form-label">MMK Transfer Amount</label>
+        <input type="text" id="MMK_Trans_Amt" name="MMK_Trans_Amt" class="form-input" inputmode="decimal" pattern="^\d+(\.\d+)?$">
+        <small style="color:#888;">Auto-calculated from RM Collected Amount × RM Buying Rate. You can edit if needed.</small>
+      </div>
+
+      <!-- 11. RM Service Fee (numeric, required) -->
+      <div class="form-section">
+        <label for="RM_Service_Fee" class="form-label">RM Service Fee <span class="form-required">*</span></label>
+        <input type="number" id="RM_Service_Fee" name="RM_Service_Fee" class="form-input" min="0">
+      </div>
+
+      <!-- 12. Receipt Image (File upload field - multiple files) -->
+      <div class="form-section">
+        <label for="receiptImage" class="form-label">Receipt Image (Optional)</label>
+        <input
+          type="file"
+          id="receiptImage"
+          name="receiptImage"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png"
+          class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-medium file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+        >
+        <p class="mt-1 text-sm text-gray-500" style="margin-top: 8px; font-size: 0.9rem; color: #666;">You can upload multiple files (PDF, JPG, JPEG, PNG). Max file size per file: 10MB.</p>
+        <div id="filePreviewContainer" class="file-preview-container"></div>
+      </div>
+
+      <!-- 13. မှတ်ချက် -->
+      <div class="form-section">
+        <label for="မှတ်ချက်" class="form-label">မှတ်ချက်</label>
+        <textarea id="မှတ်ချက်" name="မှတ်ချက်" rows="4" class="form-textarea"></textarea>
+      </div>
+
+      <!-- Review & Clear Buttons -->
+      <div style="display: flex; justify-content: center; gap: 24px; margin: 32px 0 0 0;">
+        <button
+          type="button"
+          id="reviewButton"
+          style="
+            min-width: 160px;
+            padding: 18px 32px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(103,58,183,0.10);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          "
+          onmouseover="this.style.background='#5b21b6'"
+          onmouseout="this.style.background='#7c3aed'"
+        >Review &amp; Submit</button>
+        <button
+          type="button"
+          id="clearButton"
+          style="
+            min-width: 120px;
+            padding: 18px 32px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(103,58,183,0.07);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          "
+          onmouseover="this.style.background='#5b21b6'"
+          onmouseout="this.style.background='#7c3aed'"
+        >Clear</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" class="modal-overlay hidden">
+    <div class="modal-content" style="background: #f6f3fb; border-radius: 18px; box-shadow: 0 4px 24px rgba(103,58,183,0.13);">
+      <h3 class="text-2xl font-bold text-gray-800 mb-5 text-center" style="margin-bottom: 28px;">Please Review Your Details</h3>
+      <div id="reviewDetails" style="display: flex; flex-direction: column; gap: 18px; padding: 0 8px 8px 8px;">
+        <!-- Review details will be populated here by JavaScript -->
+      </div>
+      <div style="margin-top: 32px; display: flex; justify-content: center; gap: 18px;">
+        <button type="button" id="submitButton" style="padding: 12px 28px; border-radius: 8px; background: #22c55e; color: #fff; font-weight: 600; font-size: 1.1rem; border: none; box-shadow: 0 2px 8px rgba(34,197,94,0.10); cursor: pointer;">Confirm &amp; Submit</button>
+        <button type="button" id="editButton" style="padding: 12px 28px; border-radius: 8px; background: #fff; color: #5e35b1; font-weight: 600; font-size: 1.1rem; border: 1.5px solid #d1c4e9; box-shadow: 0 2px 8px rgba(103,58,183,0.07); cursor: pointer;">Edit</button>
+      </div>
+      <div id="loadingIndicator" class="hidden text-center mt-4 text-green-600 font-medium">
+        Submitting...
+      </div>
+      <div id="messageBox" class="hidden mt-4 p-3 rounded-md text-sm text-center" role="alert"></div>
+    </div>
+  </div>
+
+  <script>
+    // Get references to DOM elements
+    const myForm = document.getElementById('myForm');
+    const reviewButton = document.getElementById('reviewButton');
+    const reviewModal = document.getElementById('reviewModal');
+    const reviewDetails = document.getElementById('reviewDetails');
+    const submitButton = document.getElementById('submitButton');
+    const editButton = document.getElementById('editButton');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const messageBox = document.getElementById('messageBox');
+
+    // New form fields
+    const BGSelect = document.getElementById('BG');
+    const Propose_DateInput = document.getElementById('Propose_Date');
+    const MM_BankSelect = document.getElementById('MM_Bank');
+    const RM_Collect_AmtInput = document.getElementById('RM_Collect_Amt');
+    const RM_Buy_RateInput = document.getElementById('RM_Buy_Rate');
+    const RM_Service_FeeInput = document.getElementById('RM_Service_Fee');
+    const receiptImageInput = document.getElementById('receiptImage');
+    const မှတ်ချက်Input = document.getElementById('မှတ်ချက်');
+    const MMK_Trans_AmtInput = document.getElementById('MMK_Trans_Amt');
+    let mmkUserEdited = false;
+
+    // File management
+    let selectedFiles = [];
+    const filePreviewContainer = document.getElementById('filePreviewContainer');
+
+    // When user types in MMK field, mark as edited
+    MMK_Trans_AmtInput.addEventListener('input', function() {
+      mmkUserEdited = true;
+    });
+
+    // Auto-calculate MMK Transfer Amount unless user has edited it
+    function autoFillMMKAmount() {
+      if (mmkUserEdited) return;
+      const rmAmount = parseFloat(RM_Collect_AmtInput.value);
+      const rmRate = parseFloat(RM_Buy_RateInput.value);
+      if (!isNaN(rmAmount) && !isNaN(rmRate)) {
+        const result = rmAmount * rmRate;
+        // Check if both inputs are integers
+        if (Number.isInteger(rmAmount) && Number.isInteger(rmRate)) {
+          MMK_Trans_AmtInput.value = Math.round(result).toString();
+        } else {
+          MMK_Trans_AmtInput.value = result.toString();
+        }
+      } else {
+        MMK_Trans_AmtInput.value = '';
+      }
+    }
+
+    // Reset user edit flag if RM fields change
+    RM_Collect_AmtInput.addEventListener('input', function() {
+      mmkUserEdited = false;
+      autoFillMMKAmount();
+    });
+    RM_Buy_RateInput.addEventListener('input', function() {
+      mmkUserEdited = false;
+      autoFillMMKAmount();
+    });
+
+    // Optionally, recalculate on form reset
+    myForm.addEventListener('reset', function() {
+      mmkUserEdited = false;
+      setTimeout(autoFillMMKAmount, 0);
+    });
+
+    // Conditional field groups
+    const conditionalGroup1 = document.getElementById('conditionalGroup1');
+    const conditionalGroup2 = document.getElementById('conditionalGroup2');
+    const conditionalGroup3 = document.getElementById('conditionalGroup3');
+    const conditionalGroup4 = document.getElementById('conditionalGroup4');
+
+    // Individual conditional fields for easy access
+    const Bank_BranchInput = document.getElementById('Bank_Branch');
+    const Bank_Acc_NoInput = document.getElementById('Bank_Acc_No');
+    const NRC_NumberInput = document.getElementById('NRC_Number');
+    const nameInput = document.getElementById('Name');
+    const Ph_NoInput = document.getElementById('Ph_No');
+
+    // Function to show/hide conditional sections based on dropdown selection
+    function updateConditionalFields() {
+      const selectedBank = MM_BankSelect.value;
+
+      // Hide all conditional groups and clear their values
+      [conditionalGroup1, conditionalGroup2, conditionalGroup3, conditionalGroup4].forEach(group => {
+        group.classList.add('hidden');
+        Array.from(group.querySelectorAll('input, select, textarea')).forEach(input => {
+          input.value = ''; // Clear value
+        });
+      });
+
+      // Show logic only (no required attribute changes)
+      switch (selectedBank) {
+        case 'Kpay':
+        case 'WaveAcc':
+          conditionalGroup3.classList.remove('hidden'); // Name
+          conditionalGroup4.classList.remove('hidden'); // Phone Number
+          break;
+        case 'WaveShop':
+        case 'Cash Delivery':
+          conditionalGroup2.classList.remove('hidden'); // NRC Number
+          conditionalGroup3.classList.remove('hidden'); // Name
+          conditionalGroup4.classList.remove('hidden'); // Phone Number
+          break;
+        case 'Phone Bill':
+          conditionalGroup4.classList.remove('hidden'); // Only Phone Number
+          break;
+        case 'KBZ Bank':
+        case 'CB Bank':
+        case 'AGD Bank':
+        case 'AYA Bank':
+        case 'GT Bank':
+        case 'MAB Bank':
+        case 'UAB Bank':
+        case 'YOMA Bank':
+          conditionalGroup1.classList.remove('hidden'); // Township, Bank Account Number
+          conditionalGroup2.classList.remove('hidden'); // NRC Number
+          conditionalGroup3.classList.remove('hidden'); // Name
+          conditionalGroup4.classList.remove('hidden'); // Phone Number
+          break;
+        default:
+          // No selection or invalid selection, all conditional fields hidden
+          break;
+      }
+    }
+
+    // Function to show the review modal
+    function showReviewModal() {
+      // Validate form fields before showing review
+      if (!myForm.checkValidity()) {
+        myForm.reportValidity(); // Show browser's validation messages
+        return;
+      }
+
+      // Clear previous review details
+      reviewDetails.innerHTML = '';
+
+      // Get all form elements using FormData
+      const formData = new FormData(myForm);
+      let reviewHtml = '';
+      const fieldsToDisplay = [];
+
+      // Manually add fields in desired display order for review
+      fieldsToDisplay.push({ label: 'Business Group', value: formData.get('BG') });
+      fieldsToDisplay.push({ label: 'Propose Date', value: formData.get('Propose_Date') });
+      fieldsToDisplay.push({ label: 'Myanmar Bank', value: formData.get('MM_Bank') });
+
+      // Add conditional fields only if they are visible and have a value
+      if (!conditionalGroup1.classList.contains('hidden')) {
+        fieldsToDisplay.push({ label: 'Township (Bank Branch)', value: formData.get('Bank_Branch') });
+        fieldsToDisplay.push({ label: 'Bank Account Number', value: formData.get('Bank_Acc_No') });
+      }
+      if (!conditionalGroup2.classList.contains('hidden')) {
+        fieldsToDisplay.push({ label: 'NRC Number', value: formData.get('NRC_Number') });
+      }
+      if (!conditionalGroup3.classList.contains('hidden')) {
+        fieldsToDisplay.push({ label: 'Name', value: formData.get('Name') });
+      }
+      if (!conditionalGroup4.classList.contains('hidden')) {
+        fieldsToDisplay.push({ label: 'Phone Number', value: formData.get('Ph_No') });
+      }
+
+      fieldsToDisplay.push({ label: 'RM Collected Amount', value: formData.get('RM_Collect_Amt') });
+      fieldsToDisplay.push({ label: 'RM Buying Rate', value: formData.get('RM_Buy_Rate') });
+      fieldsToDisplay.push({ label: 'MMK Transfer Amount', value: formData.get('MMK_Trans_Amt') });
+      fieldsToDisplay.push({ label: 'RM Service Fee', value: formData.get('RM_Service_Fee') });
+
+      // Handle multiple file uploads for review
+      const files = selectedFiles; // Use selectedFiles instead of receiptImageInput.files
+      if (files.length > 0) {
+        let fileNames = files.map(file => file.name).join(', ');
+        fieldsToDisplay.push({ label: 'Receipt Images', value: fileNames });
+      } else {
+        fieldsToDisplay.push({ label: 'Receipt Images', value: 'No files selected' });
+      }
+
+      fieldsToDisplay.push({ label: 'မှတ်ချက်', value: formData.get('မှတ်ချက်') });
+
+      // Build review HTML from the ordered list
+      fieldsToDisplay.forEach(field => {
+        // List of fields to format and highlight
+        const highlightFields = [
+          'RM Collected Amount',
+          'RM Buying Rate',
+          'MMK Transfer Amount',
+          'RM Service Fee'
+        ];
+        let valueHtml = field.value;
+        if (highlightFields.includes(field.label)) {
+          valueHtml = `<span style="
+            font-weight: bold;
+            background: #ede7f6;
+            color: #000000;
+            padding: 2px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            font-size: 1.08em;
+          ">${formatNumberWithCommas(field.value)}</span>`;
+        }
+        if (field.value !== null && field.value !== '') {
+          reviewHtml += `
+            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+              <span style="min-width: 150px; width: 150px; font-weight: 600; color: #5e35b1; text-align: left; padding-right: 4px; flex-shrink: 0;">${field.label}</span>
+              <span style="font-weight: 700; color: #222; margin: 0 4px; flex-shrink: 0;">:</span>
+              <span style="flex: 1; color: #222; padding-left: 4px; word-break: break-word;">${valueHtml}</span>
+            </div>
+          `;
+        }
+      });
+      reviewDetails.innerHTML = reviewHtml;
+
+      // Display the modal
+      reviewModal.classList.remove('hidden');
+      messageBox.classList.add('hidden'); // Hide any previous messages
+      messageBox.textContent = '';
+      loadingIndicator.classList.add('hidden'); // Hide loading indicator
+      submitButton.disabled = false; // Enable submit button
+    }
+
+    // Function to hide the review modal
+    function hideReviewModal() {
+      reviewModal.classList.add('hidden');
+    }
+
+    // Function to display messages (success/error)
+    function showMessage(message, type = 'success') {
+      messageBox.textContent = message;
+      messageBox.classList.remove('hidden');
+      if (type === 'success') {
+        messageBox.className = 'mt-4 p-3 rounded-md text-sm text-center bg-green-100 text-green-800';
+      } else {
+        messageBox.className = 'mt-4 p-3 rounded-md text-sm text-center bg-red-100 text-red-800';
+      }
+    }
+
+    // Function to submit the form data using fetch (using base64 encoding for files like the sample)
+    async function submitForm() {
+      loadingIndicator.classList.remove('hidden');
+      submitButton.disabled = true;
+
+      try {
+        // Add RM_Total_Amt calculation before submission
+        const rmCollected = parseFloat(RM_Collect_AmtInput.value) || 0;
+        const rmServiceFee = parseFloat(RM_Service_FeeInput.value) || 0;
+        const rmTotal = rmCollected + rmServiceFee;
+        
+        // Create URLSearchParams object like the sample code
+        const payload = new URLSearchParams();
+        
+        // Add all text fields manually
+        payload.append('BG', BGSelect.value || '');
+        payload.append('Propose_Date', Propose_DateInput.value || '');
+        payload.append('MM_Bank', MM_BankSelect.value || '');
+        payload.append('Bank_Branch', document.getElementById('Bank_Branch').value || '');
+        payload.append('Bank_Acc_No', document.getElementById('Bank_Acc_No').value || '');
+        payload.append('NRC_Number', document.getElementById('NRC_Number').value || '');
+        payload.append('Name', document.getElementById('Name').value || '');
+        payload.append('Ph_No', document.getElementById('Ph_No').value || '');
+        payload.append('RM_Collect_Amt', RM_Collect_AmtInput.value || '');
+        payload.append('RM_Buy_Rate', RM_Buy_RateInput.value || '');
+        payload.append('RM_Service_Fee', RM_Service_FeeInput.value || '');
+        payload.append('RM_Total_Amt', rmTotal.toString());
+        payload.append('MMK_Trans_Amt', MMK_Trans_AmtInput.value || '');
+        payload.append('မှတ်ချက်', မှတ်ချက်Input.value || '');
+
+        // Handle file uploads using base64 encoding exactly like the sample
+        if (selectedFiles.length > 0) {
+          console.log(`📎 Processing ${selectedFiles.length} files for upload`);
+          
+          // Process files sequentially to avoid issues
+          const filePromises = [];
+          for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            console.log(`📎 Processing file ${i + 1}: "${file.name}", size: ${file.size}, type: ${file.type}`);
+            
+            filePromises.push(new Promise((resolve, reject) => {
+              const fr = new FileReader();
+              fr.onload = function(f) {
+                const content = f.target.result.split(",")[1]; // base64 content, exactly like sample
+                
+                // Add file data to payload
+                if (selectedFiles.length === 1) {
+                  payload.append('filename', file.name);
+                  payload.append('mimetype', file.type);
+                  payload.append('data', content);
+                } else {
+                  payload.append(`filename_${i}`, file.name);
+                  payload.append(`mimetype_${i}`, file.type);
+                  payload.append(`data_${i}`, content);
+                }
+                resolve();
+              };
+              fr.onerror = reject;
+              fr.readAsDataURL(file); // Same as sample code
+            }));
+          }
+          
+          // Wait for all files to be processed
+          await Promise.all(filePromises);
+        } else {
+          console.log("📎 No files found in file input");
+        }
+
+        // DEBUG: Log all form data
+        console.log("=== CLIENT SIDE DEBUG: URLSearchParams creation (like sample) ===");
+        for (let [key, value] of payload.entries()) {
+          if (key.includes('data')) {
+            console.log(`📎 FILE DATA: ${key} = [base64 content, length: ${value.length}]`);
+          } else {
+            console.log(`📝 DATA: ${key} = ${value}`);
+          }
+        }
+
+        // Submit via fetch exactly like the sample code
+        console.log("🚀 Submitting form data...");
+        const response = await fetch(myForm.action, {
+          method: 'POST',
+          body: payload  // Using URLSearchParams like the sample
+        });
+
+        const result = await response.text();
+        
+        // Try to parse JSON response
+        try {
+          const jsonResult = JSON.parse(result);
+          if (jsonResult.status === 'success') {
+            showMessage(`✅ ${jsonResult.message} Transaction ID: ${jsonResult.id}`, 'success');
+            // Reset form after successful submission
+            setTimeout(() => {
+              myForm.reset();
+              selectedFiles = []; // Clear selected files
+              updateFilePreview(); // Clear file preview
+              updateConditionalFields();
+              hideReviewModal();
+            }, 2000);
+          } else {
+            showMessage(`❌ ${jsonResult.message}`, 'error');
+          }
+        } catch (parseError) {
+          // If response is not JSON, check if it's HTML (might be redirect or error page)
+          if (result.includes('<!DOCTYPE html>') || result.includes('<html')) {
+            showMessage('✅ Form submitted successfully! (Redirected to confirmation page)', 'success');
+            setTimeout(() => {
+              myForm.reset();
+              selectedFiles = []; // Clear selected files
+              updateFilePreview(); // Clear file preview
+              updateConditionalFields();
+              hideReviewModal();
+            }, 2000);
+          } else {
+            showMessage('✅ Form submitted successfully!', 'success');
+            setTimeout(() => {
+              myForm.reset();
+              selectedFiles = []; // Clear selected files
+              updateFilePreview(); // Clear file preview
+              updateConditionalFields();
+              hideReviewModal();
+            }, 2000);
+          }
+        }
+      } catch (error) {
+        console.error('Submission error:', error);
+        showMessage('❌ Error submitting form: ' + error.message, 'error');
+      } finally {
+        loadingIndicator.classList.add('hidden');
+        submitButton.disabled = false;
+      }
+    }
+
+    // Format number with commas (and keep decimals if present)
+    function formatNumberWithCommas(value) {
+      if (value === null || value === undefined || value === '') return '';
+      const num = Number(value);
+      if (isNaN(num)) return value;
+      // Format with commas, keep decimals if any
+      return num.toLocaleString('en-US', { maximumFractionDigits: 8 });
+    }
+
+    // File management functions
+    function updateFilePreview() {
+      filePreviewContainer.innerHTML = '';
+      selectedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-preview-item';
+        fileItem.innerHTML = `
+          <span class="file-preview-name" title="${file.name}">${file.name}</span>
+          <button type="button" class="file-remove-btn" onclick="removeFile(${index})" title="Remove file">×</button>
+        `;
+        filePreviewContainer.appendChild(fileItem);
+      });
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      updateFilePreview();
+      
+      // Create a new FileList-like object and update the input
+      const dt = new DataTransfer();
+      selectedFiles.forEach(file => dt.items.add(file));
+      receiptImageInput.files = dt.files;
+    }
+
+    // Handle file input change
+    function handleFileSelection(event) {
+      const files = Array.from(event.target.files);
+      const maxFileSize = 10 * 1024 * 1024; // 10MB in bytes
+      
+      let hasOversizedFile = false;
+      const validFiles = [];
+      
+      files.forEach(file => {
+        if (file.size > maxFileSize) {
+          hasOversizedFile = true;
+        } else {
+          validFiles.push(file);
+        }
+      });
+      
+      if (hasOversizedFile) {
+        alert('One or more files exceed the 10MB size limit. Only valid files will be added.');
+      }
+      
+      // Add valid files to selectedFiles array
+      selectedFiles = [...selectedFiles, ...validFiles];
+      
+      // Update the file input with all selected files
+      const dt = new DataTransfer();
+      selectedFiles.forEach(file => dt.items.add(file));
+      receiptImageInput.files = dt.files;
+      
+      updateFilePreview();
+      
+      // Clear the input value to allow selecting the same file again if needed
+      event.target.value = '';
+    }
+
+    // Initial call to set up sections when the page loads
+    document.addEventListener('DOMContentLoaded', updateConditionalFields);
+
+    // Event Listeners
+    MM_BankSelect.addEventListener('change', updateConditionalFields);
+    reviewButton.addEventListener('click', showReviewModal);
+    submitButton.addEventListener('click', submitForm);
+    editButton.addEventListener('click', hideReviewModal); // Simply hide modal to allow editing
+    document.getElementById('clearButton').addEventListener('click', function() {
+      myForm.reset();
+      selectedFiles = []; // Clear selected files
+      updateFilePreview(); // Clear file preview
+      updateConditionalFields();
+    });
+
+    // File input change event - use the new handler
+    receiptImageInput.addEventListener('change', handleFileSelection);
+  </script>
+
+</body>
+</html>
